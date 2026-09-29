@@ -2,11 +2,30 @@
 
 ## Project goal
 
-The main goal of this project is to develop a machine learning model that estimates how likely a bus is to break down within a specified future period, using features extracted from vehicle specifications and operational history. The intended outcome is a probability that helps a fleet operator prioritize inspections and plan maintenance before a vehicle fails.
+The main goal of this project is to develop a machine learning model that estimates a bus's **current breakdown risk at the date of evaluation**, using its sensor history, repairs, servicing, specifications and accumulated use. The model should emphasize long-term deterioration and usage patterns, helping a fleet operator prioritize inspections and maintenance.
 
 The intended main target is the probability that **at least one component fails**, with optional component-level probabilities. We are searching for a dataset that supports this broader target with mechanical histories from buses or comparable heavy road vehicles.
 
 The repository currently contains the **SCANIA Component X Dataset**, downloaded earlier. It contains SCANIA **trucks** and events for one anonymized engine component. Its repair and replacement records serve as failure labels. It is a partial benchmark and is not the selected solution for whole-vehicle prediction. Applying any model to JUDU buses will require relevant bus data, retraining and validation. [Dataset paper](https://doi.org/10.1038/s41597-025-04802-6)
+
+## Intended model inputs and output
+
+These are requirements for the intended bus model; the current SCANIA dataset does not provide all of them.
+
+| Input | Information to include |
+|---|---|
+| Sensor history | Timestamped readings over time, such as temperatures, pressures, RPM and voltage. |
+| Repair history | What was repaired or replaced, when it happened, and the affected component or system. |
+| Bus specifications | Manufacturer, model, production date/year, age, powertrain and other relevant specifications. |
+| Oil and service history | Dates of oil refills and oil changes, recorded separately; refill quantities when available. |
+| Distance travelled | Total mileage, with explicit miles/kilometres units, and distance travelled since relevant repairs or servicing. |
+| Engine operating hours | Total engine hours (moto hours), their history, and hours accumulated since relevant repairs or servicing. |
+
+**Output:** a probability expressing how likely the vehicle is to break down now, assessed as of the evaluation date. A breakdown means that at least one component fails. The result should include the vehicle ID, evaluation date and overall probability; component-level probabilities may also be provided. Use only records available by that date.
+
+For training and evaluation, the event window represented by “now” must be defined consistently and stated alongside the probability. The evaluation date identifies when the assessment is made; it does not by itself define that event window.
+
+**Focus on long-term tendencies:** use trends over days, weeks and months, accumulated wear, recurring abnormalities, changes in oil refill frequency, and time/distance/engine hours since maintenance. Brief sensor fluctuations should carry less weight than sustained changes supported by the vehicle's history. Compare readings under similar operating conditions where possible, so ordinary changes in load or driving conditions do not dominate the assessment.
 
 ## Dataset research
 
@@ -66,7 +85,7 @@ The download is approximately 1.54 GiB. If Git LFS is unavailable, the manifest 
 ## Proposed development approach
 
 1. Inspect missing values, observation intervals, counter resets, and label distributions.
-2. Extract features such as the latest readings, counter changes per time step, historical trends, normalized histogram distributions, and vehicle categories. Treat anonymized feature meanings as unknown.
+2. Extract features that emphasize long-term trends, recurring abnormalities and accumulated use. For SCANIA, use counter changes, historical trends, normalized histogram distributions and vehicle categories while treating anonymized feature meanings as unknown. For a suitable bus dataset, also include repair/service history and time, distance and engine hours since those events.
 3. Train a baseline probability model and compare it with a survival model that accounts for censoring. Exclude future readings and target information from input features. For horizon-based training, handle observations whose follow-up ends before the horizon as censored rather than assigning them a negative label.
 4. Preserve the supplied vehicle splits. Fit preprocessing on training data, tune and calibrate probabilities using validation data, and reserve the test set for final evaluation.
 5. Evaluate probability calibration, Brier score, precision and recall, and the maintenance cost of missed failures and unnecessary inspections. Use censoring-aware metrics where needed and assess each prediction horizon separately.
