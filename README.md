@@ -4,9 +4,16 @@
 
 The main goal of this project is to develop a machine learning model that estimates how likely a bus is to break down within a specified future period, using features extracted from vehicle specifications and operational history. The intended outcome is a probability that helps a fleet operator prioritize inspections and plan maintenance before a vehicle fails.
 
-The first stage uses the **SCANIA Component X Dataset** to develop and evaluate the prediction method. This dataset contains SCANIA **trucks** and events for one anonymized engine component. Its repair and replacement records serve as failure labels. Applying the model to JUDU buses will require relevant bus data and validation; performance on this dataset alone cannot establish accuracy for bus breakdowns or failures of other components. [Dataset paper](https://doi.org/10.1038/s41597-025-04802-6)
+The intended main target is the probability that **at least one component fails**, with optional component-level probabilities. We are searching for a dataset that supports this broader target with mechanical histories from buses or comparable heavy road vehicles.
 
-## What the model should predict
+The repository currently contains the **SCANIA Component X Dataset**, downloaded earlier. It contains SCANIA **trucks** and events for one anonymized engine component. Its repair and replacement records serve as failure labels. It is a partial benchmark and is not the selected solution for whole-vehicle prediction. Applying any model to JUDU buses will require relevant bus data, retraining and validation. [Dataset paper](https://doi.org/10.1038/s41597-025-04802-6)
+
+## Dataset research
+
+- [Dataset selection criteria](docs/DATASET_SELECTION_CRITERIA.md): target, required data, scale, validation, and known limitations.
+- [Gemini Deep Research prompt](docs/GEMINI_DEEP_RESEARCH_PROMPT.md): a standalone prompt for a second search.
+
+## What the current SCANIA benchmark can predict
 
 For a vehicle at its latest available readout, estimate the probability of a Component X event within a chosen prediction horizon, using only information available at that readout. Start with horizons of 6, 12, 24, and 48 dataset time steps so the results can be compared with the supplied evaluation labels.
 
