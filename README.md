@@ -30,6 +30,7 @@ For training and evaluation, the event window represented by “now” must be d
 ## Dataset research
 
 - [Dataset selection criteria](docs/DATASET_SELECTION_CRITERIA.md): target, required data, scale, validation, and known limitations.
+- [Public dataset research and training decision](docs/PUBLIC_DATASET_RESEARCH.md): verified candidates, public-only limitations, and a concrete plan for training the component-event benchmark and preparing the eventual bus model.
 - [Gemini Deep Research prompt](docs/GEMINI_DEEP_RESEARCH_PROMPT.md): a standalone prompt for a second search.
 
 ## What the current SCANIA benchmark can predict
